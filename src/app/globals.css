@@ -3,6 +3,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Brat Brand Colors - EXACT VALUES REQUIRED */
+  --brat-green: #BEFF34;
+  --brat-text: #000000;
+  --brat-accent: #000000;
 }
 
 @theme inline {
@@ -10,6 +15,11 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Brat Brand Colors for Tailwind */
+  --color-brat-green: var(--brat-green);
+  --color-brat-text: var(--brat-text);
+  --color-brat-accent: var(--brat-accent);
 }
 
 @media (prefers-color-scheme: dark) {
