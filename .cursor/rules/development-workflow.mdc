@@ -1,0 +1,495 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Development Workflow & Quality Control Rules
+
+## Development Phase Compliance (MANDATORY)
+Based on [04_implement_plan.md](mdc:04_implement_plan.md), development must follow the exact 6-week timeline and milestones.
+
+### Current Phase Requirements (ENFORCE IMMEDIATELY)
+```typescript
+// REQUIRED: Phase tracking and validation
+const DEVELOPMENT_PHASES = {
+  'Phase1': {
+    name: 'Project Setup',
+    duration: 'Week 1 (5 days)',
+    status: 'current', // Update this as we progress
+    deliverables: [
+      'Next.js project initialization',
+      'TypeScript configuration',
+      'Basic component architecture',
+      'Canvas engine foundation',
+      'Core hooks implementation'
+    ],
+    blockers: [] // Track any issues
+  },
+  'Phase2': {
+    name: 'Core Features', 
+    duration: 'Week 2-4 (15 days)',
+    deliverables: [
+      'Text input with real-time preview',
+      'Scribble effect implementation',
+      'Responsive layout system',
+      'Smart text processing',
+      'Image export functionality'
+    ]
+  },
+  'Phase3': {
+    name: 'Optimization',
+    duration: 'Week 5 (5 days)', 
+    deliverables: [
+      'Performance optimization',
+      'Visual polish',
+      'Error handling',
+      'Cross-browser testing'
+    ]
+  },
+  'Phase4': {
+    name: 'Launch Preparation',
+    duration: 'Week 6 (5 days)',
+    deliverables: [
+      'SEO implementation',
+      'Analytics setup',
+      'Production deployment',
+      'Monitoring configuration'
+    ]
+  }
+} as const;
+```
+
+### Daily Development Checklist (MANDATORY)
+```bash
+# REQUIRED: Daily development validation
+□ TypeScript compiles without errors
+□ ESLint passes with zero warnings
+□ All tests pass (when implemented)
+□ Canvas renders correctly on test devices
+□ Performance metrics within targets
+□ No console errors in browser
+□ Responsive design works on mobile/desktop
+□ Git commits follow conventional format
+□ Code reviewed against rules
+□ Documentation updated if needed
+```
+
+## Code Quality Standards (STRICT ENFORCEMENT)
+
+### File Naming Conventions (REQUIRED)
+```typescript
+// REQUIRED: Exact file naming patterns
+const FILE_NAMING_RULES = {
+  // Components: PascalCase
+  components: 'BratGenerator.tsx',
+  'ui-components': 'Toggle.tsx',
+  'control-components': 'SizeSelector.tsx',
+  
+  // Hooks: camelCase with 'use' prefix
+  hooks: 'useCanvas.ts',
+  'custom-hooks': 'useBratGenerator.ts',
+  
+  // Utils: kebab-case
+  utils: 'canvas-renderer.ts',
+  'util-classes': 'scribble-effect.ts',
+  
+  // Types: kebab-case
+  types: 'canvas.ts',
+  'type-definitions': 'generator.ts',
+  
+  // Constants: kebab-case
+  constants: 'colors.ts',
+  configs: 'fonts.ts'
+} as const;
+```
+
+### Code Structure Standards (MANDATORY)
+```typescript
+// REQUIRED: Component structure template
+interface ComponentProps {
+  // Props interface first
+}
+
+export const ComponentName = ({ prop1, prop2 }: ComponentProps) => {
+  // 1. Hooks (in order: useState, useEffect, custom hooks)
+  const [state, setState] = useState<Type>(initialValue);
+  
+  useEffect(() => {
+    // Effect logic
+  }, [dependencies]);
+  
+  const customHook = useCustomHook();
+  
+  // 2. Event handlers
+  const handleEvent = useCallback((param: Type) => {
+    // Handler logic
+  }, [dependencies]);
+  
+  // 3. Computed values
+  const computedValue = useMemo(() => {
+    return calculation;
+  }, [dependencies]);
+  
+  // 4. Early returns (if any)
+  if (condition) return <div>Early return</div>;
+  
+  // 5. Main render
+  return (
+    <div className="component-container">
+      {/* JSX content */}
+    </div>
+  );
+};
+
+// REQUIRED: Type export
+export type { ComponentProps };
+```
+
+### Hook Implementation Standards (REQUIRED)
+```typescript
+// REQUIRED: Custom hook pattern
+export const useCustomHook = (param?: Type) => {
+  // 1. State declarations
+  const [state, setState] = useState<Type>();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  
+  // 2. Refs and mutable values
+  const ref = useRef<HTMLElement>(null);
+  
+  // 3. Callbacks and memoized functions
+  const memoizedCallback = useCallback((arg: Type) => {
+    // Implementation
+  }, [dependencies]);
+  
+  // 4. Effects
+  useEffect(() => {
+    // Effect logic with proper cleanup
+    return () => {
+      // Cleanup
+    };
+  }, [dependencies]);
+  
+  // 5. Return object (always same structure)
+  return {
+    // State values
+    state,
+    loading,
+    error,
+    
+    // Functions
+    memoizedCallback,
+    
+    // Refs
+    ref
+  };
+};
+
+// REQUIRED: Return type export
+export type UseCustomHookReturn = ReturnType<typeof useCustomHook>;
+```
+
+## Error Handling Standards (MANDATORY)
+
+### Error Boundary Implementation (REQUIRED)
+```typescript
+// REQUIRED: Canvas error boundary
+interface CanvasErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+export class CanvasErrorBoundary extends Component<
+  { children: ReactNode },
+  CanvasErrorBoundaryState
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): CanvasErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Canvas Error:', error, errorInfo);
+    // REQUIRED: Error reporting (when analytics are set up)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center p-8 text-center">
+          <div>
+            <h2 className="text-xl font-semibold mb-2">Canvas Error</h2>
+            <p className="text-gray-600 mb-4">
+              Failed to render the canvas. Please refresh and try again.
+            </p>
+            <button 
+              onClick={() => this.setState({ hasError: false })}
+              className="px-4 py-2 bg-brat-green text-black rounded"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+```
+
+### Async Error Handling (REQUIRED PATTERN)
+```typescript
+// REQUIRED: Async operation wrapper
+const withAsyncErrorHandling = async <T>(
+  operation: () => Promise<T>,
+  errorMessage: string
+): Promise<T | null> => {
+  try {
+    return await operation();
+  } catch (error) {
+    console.error(errorMessage, error);
+    
+    // REQUIRED: User-friendly error display
+    throw new Error(`${errorMessage}. Please try again.`);
+  }
+};
+
+// REQUIRED: Usage in components
+const handleDownload = async () => {
+  setLoading(true);
+  setError(null);
+  
+  try {
+    await withAsyncErrorHandling(
+      () => exportImage(canvasRef.current, text),
+      'Failed to export image'
+    );
+  } catch (error) {
+    setError(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+```
+
+## Performance Standards (NON-NEGOTIABLE)
+
+### Bundle Size Monitoring (REQUIRED)
+```typescript
+// REQUIRED: Bundle size constraints
+const BUNDLE_SIZE_LIMITS = {
+  'main-bundle': '500KB', // Gzipped
+  'chunk-vendor': '300KB', // Third-party libraries
+  'chunk-app': '200KB', // Application code
+  'total-initial': '800KB' // Total initial load
+} as const;
+
+// REQUIRED: Performance budget in Next.js config
+const performanceBudget = {
+  maxAssetSize: 500000, // 500KB
+  maxEntrypointSize: 800000, // 800KB
+};
+```
+
+### Core Web Vitals Targets (MANDATORY)
+```typescript
+// REQUIRED: Performance targets
+const PERFORMANCE_TARGETS = {
+  LCP: 2.5, // Largest Contentful Paint (seconds)
+  FID: 100, // First Input Delay (milliseconds)
+  CLS: 0.1, // Cumulative Layout Shift
+  TTI: 3.0, // Time to Interactive (seconds)
+  FCP: 1.8 // First Contentful Paint (seconds)
+} as const;
+
+// REQUIRED: Performance monitoring
+if (typeof window !== 'undefined') {
+  // Web Vitals measurement implementation
+  import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+    getCLS(console.log);
+    getFID(console.log);
+    getFCP(console.log);
+    getLCP(console.log);
+    getTTFB(console.log);
+  });
+}
+```
+
+## Testing Requirements (IMPLEMENT GRADUALLY)
+
+### Essential Test Cases (PRIORITY ORDER)
+```typescript
+// REQUIRED: Test coverage priorities
+const TEST_PRIORITIES = {
+  'canvas-rendering': {
+    priority: 'critical',
+    tests: [
+      'renders background color correctly',
+      'handles text input changes',
+      'applies scribble effect when enabled',
+      'maintains aspect ratio on resize',
+      'exports high-resolution images'
+    ]
+  },
+  'text-processing': {
+    priority: 'high', 
+    tests: [
+      'wraps long text properly',
+      'calculates optimal font size',
+      'handles special characters',
+      'manages empty input gracefully'
+    ]
+  },
+  'responsive-design': {
+    priority: 'medium',
+    tests: [
+      'mobile layout works correctly',
+      'desktop layout functions properly',
+      'touch interactions work on mobile',
+      'keyboard navigation works'
+    ]
+  }
+} as const;
+```
+
+### Manual Testing Checklist (REQUIRED BEFORE EACH COMMIT)
+```bash
+# REQUIRED: Manual testing validation
+□ Desktop Chrome: Basic functionality works
+□ Desktop Safari: Canvas renders correctly  
+□ Desktop Firefox: All features functional
+□ Mobile Safari: Touch interactions work
+□ Mobile Chrome: Virtual keyboard doesn't break layout
+□ Tablet: Responsive layout adapts properly
+□ Slow 3G: Performance remains acceptable
+□ High DPI displays: Canvas renders sharply
+□ Keyboard-only navigation: All features accessible
+□ Screen reader: Basic accessibility works
+```
+
+## Git Workflow Standards (ENFORCED)
+
+### Commit Message Format (REQUIRED)
+```bash
+# REQUIRED: Conventional commit format
+feat: add scribble effect toggle functionality
+fix: resolve canvas high-DPI rendering issue  
+perf: optimize text wrapping algorithm
+style: update button hover animations
+docs: add Canvas API documentation
+test: add text processing unit tests
+refactor: simplify component state management
+chore: update dependencies to latest versions
+
+# REQUIRED: Commit body format (if needed)
+feat: implement smart text processing
+
+- Add automatic text wrapping algorithm
+- Implement font size calculation  
+- Handle edge cases for long text
+- Optimize performance for real-time updates
+
+Closes #123
+```
+
+### Branch Naming (REQUIRED)
+```bash
+# REQUIRED: Branch naming patterns
+main                           # Main production branch
+develop                        # Development integration branch  
+feature/canvas-renderer        # New features
+fix/mobile-keyboard-issue      # Bug fixes
+perf/optimize-scribble-effect  # Performance improvements
+docs/api-documentation         # Documentation updates
+chore/update-dependencies      # Maintenance tasks
+```
+
+## Code Review Checklist (MANDATORY)
+
+### Before Submitting Code (REQUIRED)
+```bash
+# REQUIRED: Pre-submission checklist
+□ TypeScript compiles without errors
+□ ESLint passes with zero warnings  
+□ Code follows project conventions
+□ Performance impact assessed
+□ Error handling implemented
+□ Responsive design verified
+□ Accessibility considered
+□ Comments added for complex logic
+□ Tests added/updated (when applicable)
+□ Documentation updated
+```
+
+### Review Criteria (FOR REVIEWERS)
+```bash
+# REQUIRED: Code review validation
+□ Code solves the stated problem
+□ Implementation follows project patterns
+□ Performance implications acceptable
+□ Error cases handled appropriately  
+□ Code is readable and maintainable
+□ No obvious security issues
+□ Follows accessibility guidelines
+□ Mobile/responsive design works
+□ Canvas functionality intact
+□ SEO implications considered
+```
+
+## Security & Privacy Standards (MANDATORY)
+
+### Data Handling (REQUIRED)
+```typescript
+// REQUIRED: Privacy-first implementation
+const PRIVACY_REQUIREMENTS = {
+  'user-text': 'Never stored or transmitted to servers',
+  'generated-images': 'Created locally, never uploaded',
+  'analytics': 'Only essential usage metrics',
+  'cookies': 'Only for analytics, no tracking',
+  'third-party': 'Minimal external dependencies'
+} as const;
+
+// REQUIRED: Content Security Policy
+const CSP_HEADERS = {
+  'default-src': "'self'",
+  'script-src': "'self' 'unsafe-eval' *.googletagmanager.com",
+  'style-src': "'self' 'unsafe-inline' fonts.googleapis.com",
+  'font-src': "'self' fonts.gstatic.com",
+  'img-src': "'self' data: blob:",
+  'connect-src': "'self' *.google-analytics.com"
+} as const;
+```
+
+## Deployment Standards (REQUIRED)
+
+### Pre-Deployment Checklist (MANDATORY)
+```bash
+# REQUIRED: Production deployment validation
+□ All environment variables configured
+□ Performance benchmarks meet targets
+□ Cross-browser testing completed
+□ Mobile responsiveness verified
+□ SEO metadata implemented
+□ Analytics tracking functional
+□ Error monitoring active
+□ Security headers configured
+□ HTTPS enforced
+□ Core Web Vitals passing
+```
+
+## Forbidden Development Practices
+- ❌ Never commit directly to main branch
+- ❌ Never skip TypeScript type checking
+- ❌ Never ignore ESLint warnings
+- ❌ Never commit without testing on mobile
+- ❌ Never merge without code review
+- ❌ Never deploy without performance verification
+- ❌ Never implement features without error handling
+- ❌ Never skip responsive design implementation
+- ❌ Never violate accessibility guidelines  
+- ❌ Never compromise SEO requirements

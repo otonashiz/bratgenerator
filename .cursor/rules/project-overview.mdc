@@ -1,0 +1,42 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Brat Generator Project Overview
+
+## Project Description
+This is a **Brat-style image generator tool** - a lightweight, efficient online tool for creating images in the style of Charli XCX's "Brat" album cover. The tool allows users to input text and generate images with the characteristic neon green background and specific typography, with optional scribble effects.
+
+## Key Project Documents
+- [01_PRD.md](mdc:01_PRD.md) - Product Requirements Document
+- [02_Design_Guideline.md](mdc:02_Design_Guideline.md) - Design Guidelines  
+- [03_development_stack.md](mdc:03_development_stack.md) - Technical Stack Documentation
+- [04_implement_plan.md](mdc:04_implement_plan.md) - Implementation Plan
+- [05_seo_guideline.md](mdc:05_seo_guideline.md) - SEO Strategy
+
+## Core Product Principles
+1. **Simplicity First**: The tool should be immediately usable without tutorials
+2. **Mobile-First Design**: Optimized for mobile devices, enhanced for desktop
+3. **Performance**: Real-time preview with sub-200ms response times
+4. **SEO-Optimized**: Built for discoverability and search ranking
+5. **Brand Accuracy**: Faithful reproduction of the original Brat aesthetic
+
+## Target Audience
+- **Primary**: Charli XCX fans and social media content creators
+- **Secondary**: Meme culture participants and Gen Z users
+- **Geographic Focus**: United States, Indonesia, Philippines
+
+## Key Features (MVP)
+- Real-time text input with live preview
+- Scribble effect toggle (default: ON, positioned top-left on mobile)
+- Two size presets: 1:1 (Post) and 4:5 (Feed)
+- High-resolution PNG download
+- Mobile-optimized responsive design
+- SEO-friendly implementation
+
+## Success Metrics
+- **Performance**: Core Web Vitals scores >90
+- **SEO**: Rank in top 3 for "brat generator" within 3 months
+- **User Experience**: <3 second time-to-interactive on 3G networks
+- **Conversion**: >80% of users who input text download an image
