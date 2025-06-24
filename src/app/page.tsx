@@ -1,7 +1,7 @@
 'use client';
 
 import { useGenerator } from '@/hooks';
-import { TextInput, Button, Toggle } from '@/components/UI';
+import { TextInput, Button, Toggle, Canvas } from '@/components/UI';
 import { SizeSelector, DownloadButton } from '@/components/Controls';
 
 const SIZE_OPTIONS = [
@@ -118,36 +118,26 @@ export default function BratGenerator() {
             
             {/* Canvas Container */}
             <div className="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 flex items-center justify-center min-h-[400px]">
-              {text.trim() ? (
-                <div className="text-center">
-                  {/* Placeholder preview - will be replaced with actual canvas */}
-                  <div 
-                    className="bg-brat-green border-2 border-gray-300 flex items-center justify-center text-brat-text font-bold text-2xl"
-                    style={{
-                      width: size === '1:1' ? '300px' : '240px',
-                      height: size === '1:1' ? '300px' : '300px',
-                    }}
-                  >
-                    {text}
-                  </div>
-                  <p className="text-gray-500 text-sm mt-2">
-                    Preview ({size === '1:1' ? 'Square' : 'Portrait'})
-                  </p>
-                  
-                  {/* Hidden canvas for actual rendering */}
-                  <canvas
-                    ref={canvasRef}
-                    className="hidden"
-                    width={size === '1:1' ? 600 : 600}
-                    height={size === '1:1' ? 600 : 750}
-                  />
-                </div>
-              ) : (
-                <div className="text-center text-gray-400">
-                  <p className="text-lg">Enter some text to see your preview</p>
-                  <p className="text-sm mt-1">Your Brat-style cover will appear here</p>
-                </div>
-              )}
+              <div className="text-center w-full">
+                <Canvas
+                  text={text}
+                  hasScribble={hasScribble}
+                  size={size}
+                  className="w-full max-w-md mx-auto"
+                  onError={(error) => console.error('Canvas error:', error)}
+                />
+                <p className="text-gray-500 text-sm mt-2">
+                  Preview ({size === '1:1' ? 'Square' : 'Portrait'})
+                </p>
+                
+                {/* Hidden canvas for exports */}
+                <canvas
+                  ref={canvasRef}
+                  className="hidden"
+                  width={size === '1:1' ? 600 : 600}
+                  height={size === '1:1' ? 600 : 750}
+                />
+              </div>
             </div>
           </div>
         </div>
