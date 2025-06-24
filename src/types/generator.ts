@@ -32,6 +32,7 @@ export interface TextInputProps {
   placeholder?: string;
   disabled?: boolean;
   maxLength?: number;
+  className?: string;
 }
 
 export interface SizeSelectorProps {
