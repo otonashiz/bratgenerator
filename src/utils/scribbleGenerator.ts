@@ -22,6 +22,7 @@ export interface ScribbleConfig {
   height: number;
   intensity: number; // 0-1, controls density of scribbles
   seed?: number; // For reproducible randomness
+  textBounds?: { x: number; y: number; width: number; height: number; }; // Precise text location
 }
 
 /**
@@ -47,7 +48,9 @@ class SeededRandom {
 
 /**
  * Generates a single scribble stroke using Bezier curves
+ * Currently unused but kept for potential future texture effects
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function generateStroke(
   startX: number,
   startY: number,
@@ -86,52 +89,142 @@ function generateStroke(
 }
 
 /**
- * Generates multiple scribble strokes for a natural appearance
+ * Generates a crossing stroke from start to end point with natural variation
+ */
+function generateCrossingStroke(
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number,
+  random: SeededRandom
+): ScribbleStroke {
+  const points: ScribblePoint[] = [];
+  const numPoints = Math.floor(random.range(6, 12));
+  
+  // Calculate the main direction vector
+  const deltaX = endX - startX;
+  const deltaY = endY - startY;
+  
+  for (let i = 0; i < numPoints; i++) {
+    const progress = i / (numPoints - 1);
+    
+    // Base position along the line
+    const baseX = startX + deltaX * progress;
+    const baseY = startY + deltaY * progress;
+    
+    // Add natural variation perpendicular to the line
+    const perpX = -deltaY;
+    const perpY = deltaX;
+    const perpLength = Math.sqrt(perpX * perpX + perpY * perpY);
+    
+    if (perpLength > 0) {
+      const normalizedPerpX = perpX / perpLength;
+      const normalizedPerpY = perpY / perpLength;
+      
+      // Add random offset perpendicular to the line
+      const offset = random.range(-8, 8);
+      const finalX = baseX + normalizedPerpX * offset;
+      const finalY = baseY + normalizedPerpY * offset;
+      
+      points.push({
+        x: finalX,
+        y: finalY,
+        pressure: random.range(0.4, 0.8)
+      });
+    } else {
+      points.push({
+        x: baseX,
+        y: baseY,
+        pressure: random.range(0.4, 0.8)
+      });
+    }
+  }
+  
+  return {
+    points,
+    thickness: random.range(2, 4),
+    opacity: random.range(0.4, 0.8)
+  };
+}
+
+/**
+ * Generates crossing-out style scribble strokes over text area
  */
 export function generateScribblePattern(config: ScribbleConfig): ScribbleStroke[] {
-  const { width, height, intensity, seed = Date.now() } = config;
+  const { width, height, intensity, seed = Date.now(), textBounds } = config;
   const random = new SeededRandom(seed);
   
   const strokes: ScribbleStroke[] = [];
-  const numStrokes = Math.floor(intensity * 15 + 5); // 5-20 strokes based on intensity
   
-  for (let i = 0; i < numStrokes; i++) {
-    // Random starting position with bias toward corners and edges
-    const edgeBias = random.next() < 0.6; // 60% chance to start near edges
+  // Define text area: use precise textBounds if available, otherwise fallback to margin
+  let textAreaX, textAreaY, textAreaWidth, textAreaHeight;
+  
+  if (textBounds) {
+    textAreaX = textBounds.x;
+    textAreaY = textBounds.y;
+    textAreaWidth = textBounds.width;
+    textAreaHeight = textBounds.height;
+  } else {
+    // Fallback for safety, though it should always receive textBounds now
+    const margin = 40;
+    textAreaX = margin;
+    textAreaY = margin;
+    textAreaWidth = width - (margin * 2);
+    textAreaHeight = height - (margin * 2);
+  }
+  
+  // Generate 4-8 main crossing lines based on intensity (more lines than before)
+  const numMainStrokes = Math.floor(intensity * 6 + 4); // 4-10 main strokes
+  
+  for (let i = 0; i < numMainStrokes; i++) {
+    // Generate lines that cross through the text area
+    const isHorizontal = random.next() < 0.6; // 60% horizontal, 40% diagonal/vertical
     
-    let startX: number, startY: number;
+    let startX: number, startY: number, endX: number, endY: number;
     
-    if (edgeBias) {
-      // Start near edges
-      const edge = Math.floor(random.range(0, 4));
-      switch (edge) {
-        case 0: // Top edge
-          startX = random.range(0, width);
-          startY = random.range(0, height * 0.3);
-          break;
-        case 1: // Right edge
-          startX = random.range(width * 0.7, width);
-          startY = random.range(0, height);
-          break;
-        case 2: // Bottom edge
-          startX = random.range(0, width);
-          startY = random.range(height * 0.7, height);
-          break;
-        default: // Left edge
-          startX = random.range(0, width * 0.3);
-          startY = random.range(0, height);
-          break;
-      }
+    if (isHorizontal) {
+      // Horizontal crossing lines
+      startX = textAreaX - random.range(10, 30);
+      endX = textAreaX + textAreaWidth + random.range(10, 30);
+      startY = endY = textAreaY + random.range(textAreaHeight * 0.2, textAreaHeight * 0.8);
+      
+      // Add slight vertical variation for natural look
+      endY += random.range(-15, 15);
     } else {
-      // Random position anywhere
-      startX = random.range(width * 0.1, width * 0.9);
-      startY = random.range(height * 0.1, height * 0.9);
+      // Diagonal crossing lines
+      const direction = random.next() < 0.5 ? 1 : -1; // Top-left to bottom-right or vice versa
+      
+      if (direction > 0) {
+        // Top-left to bottom-right
+        startX = textAreaX - random.range(10, 30);
+        startY = textAreaY - random.range(10, 30);
+        endX = textAreaX + textAreaWidth + random.range(10, 30);
+        endY = textAreaY + textAreaHeight + random.range(10, 30);
+      } else {
+        // Top-right to bottom-left
+        startX = textAreaX + textAreaWidth + random.range(10, 30);
+        startY = textAreaY - random.range(10, 30);
+        endX = textAreaX - random.range(10, 30);
+        endY = textAreaY + textAreaHeight + random.range(10, 30);
+      }
     }
     
-    const strokeLength = random.range(Math.min(width, height) * 0.1, Math.min(width, height) * 0.4);
-    const stroke = generateStroke(startX, startY, strokeLength, random);
-    strokes.push(stroke);
+    // Generate a crossing stroke
+    const crossingStroke = generateCrossingStroke(startX, startY, endX, endY, random);
+    strokes.push(crossingStroke);
   }
+  
+  // Texture strokes temporarily disabled for testing
+  // const numTextureStrokes = Math.floor(intensity * 3 + 2); // 2-5 texture strokes
+  
+  // for (let i = 0; i < numTextureStrokes; i++) {
+  //   const startX = random.range(textAreaX, textAreaX + textAreaWidth);
+  //   const startY = random.range(textAreaY, textAreaY + textAreaHeight);
+  //   const strokeLength = random.range(20, 60);
+  //   
+  //   const textureStroke = generateStroke(startX, startY, strokeLength, random);
+  //   strokes.push(textureStroke);
+  // }
   
   return strokes;
 }

@@ -3,14 +3,14 @@
 
 export const BRAT_COLORS = {
   // PRIMARY COLORS - DO NOT MODIFY
-  green: '#BEFF34',    // Main background - EXACT match required
+  green: '#8BCF01',    // Main background - EXACT match required
   text: '#000000',     // Text color - Pure black only
   accent: '#000000',   // UI elements - Pure black only
 } as const;
 
 // CSS Custom Properties for Tailwind
 export const CSS_VARIABLES = {
-  '--brat-green': '#BEFF34',
+  '--brat-green': '#8BCF01',
   '--brat-text': '#000000', 
   '--brat-accent': '#000000',
 } as const;

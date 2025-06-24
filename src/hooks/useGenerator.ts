@@ -1,5 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 import type { BratGeneratorState, UseBratGeneratorReturn } from '@/types/generator';
+import type { RenderConfig } from '@/types/canvas';
+import { clearCanvas, renderText } from '@/utils/canvas';
+import { generateScribblePattern, renderScribbleToCanvas, type ScribbleConfig } from '@/utils/scribbleGenerator';
+import { BRAT_COLORS } from '@/constants/colors';
 
 const INITIAL_STATE: BratGeneratorState = {
   text: '',
@@ -67,27 +71,39 @@ export const useGenerator = (): UseBratGeneratorReturn => {
       const ctx = canvas.getContext('2d');
       
       if (ctx) {
-        // Simple green background with black text
-        ctx.fillStyle = '#BEFF34';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#000000';
-        ctx.font = 'bold 48px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(state.text, canvas.width / 2, canvas.height / 2);
+        // Clear canvas
+        clearCanvas(ctx, canvas.width, canvas.height);
         
-        // Convert to blob and download
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `brat-${state.text.slice(0, 20).replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${Date.now()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-          }
-        }, 'image/png');
+        // Create render configuration from current state
+        const renderConfig: RenderConfig = {
+          text: state.text,
+          size: state.size,
+          hasScribble: state.hasScribble,
+          backgroundColor: BRAT_COLORS.green,
+          textColor: BRAT_COLORS.text,
+          fontSize: 0 // Will be calculated dynamically
+        };
+        
+        // Render text and get its precise bounding box
+        const textBounds = renderText(ctx, renderConfig);
+        
+        // Render scribble if enabled, using the text's bounding box
+        if (state.hasScribble) {
+          const scribbleConfig: ScribbleConfig = {
+            width: canvas.width,
+            height: canvas.height,
+            intensity: 0.6, // Default intensity
+            seed: state.text.length, // Seed with text for consistency
+            textBounds: textBounds // Pass precise bounds
+          };
+          
+          const pattern = generateScribblePattern(scribbleConfig);
+          renderScribbleToCanvas(ctx, pattern);
+        }
+        
+        // Update data URL for preview
+        const dataUrl = canvas.toDataURL('image/png');
+        setState(prev => ({ ...prev, previewUrl: dataUrl, isLoading: false }));
       }
     } catch (error) {
       console.error('Failed to export image:', error);

@@ -87,7 +87,7 @@ export function calculateOptimalFontSize(
   maxHeight: number,
   fontFamily: string = 'Arial Narrow, Arial, sans-serif',
   minSize: number = 20,
-  maxSize: number = 200
+  maxSize: number = 80
 ): number {
   let fontSize = maxSize;
   
@@ -111,11 +111,12 @@ export function calculateOptimalFontSize(
 
 /**
  * Renders text with optimal sizing and positioning
+ * @returns The bounding box of the rendered text
  */
 export function renderText(
   ctx: CanvasRenderingContext2D,
   config: RenderConfig
-): void {
+): { x: number; y: number; width: number; height: number; } {
   const { text, size, hasScribble } = config;
   const canvasSize = CANVAS_SIZES[size];
   
@@ -133,9 +134,11 @@ export function renderText(
     'Arial Narrow, Arial, sans-serif'
   );
   
-  // Apply font and color
+  // Apply font and color with proper text alignment
   ctx.font = `bold ${fontSize}px Arial Narrow, Arial, sans-serif`;
   ctx.fillStyle = BRAT_COLORS.text;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
   
   // Position text in center
   const centerX = canvasSize.width / 2;
@@ -162,15 +165,31 @@ export function renderText(
     lines.push(currentLine);
   }
   
-  // Render each line
+  // Calculate dimensions for the entire text block
   const lineHeight = fontSize * 1.2;
-  const totalHeight = lines.length * lineHeight;
-  const startY = centerY - (totalHeight / 2) + (lineHeight / 2);
+  const totalTextHeight = lines.length * lineHeight;
+  
+  const lineWidths = lines.map(line => ctx.measureText(line).width);
+  const actualTextWidth = Math.max(...lineWidths);
+
+  // Calculate starting Y position to center all lines vertically
+  const startY = centerY - (totalTextHeight / 2) + (lineHeight / 2);
   
   lines.forEach((line, index) => {
     const y = startY + (index * lineHeight);
     ctx.fillText(line, centerX, y);
   });
+  
+  // Calculate the text bounding box for the scribble effect
+  const textX = centerX - actualTextWidth / 2;
+  const textY = startY - (lineHeight / 2); // Top of the first line
+  
+  return {
+    x: textX,
+    y: textY,
+    width: actualTextWidth,
+    height: totalTextHeight
+  };
 }
 
 /**

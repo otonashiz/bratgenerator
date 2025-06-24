@@ -12,7 +12,7 @@ import {
   CanvasError 
 } from '@/utils/canvas';
 import { 
-  createScribbleCache, 
+  generateScribblePattern, 
   renderScribbleToCanvas,
   type ScribbleStroke 
 } from '@/utils/scribbleGenerator';
@@ -53,23 +53,26 @@ export const Canvas = ({
     return `${text}-${size}-${hasScribble}`;
   }, [text, size, hasScribble]);
 
-  // Get or create scribble pattern
-  const getScribblePattern = useCallback((): ScribbleStroke[] => {
+  // Get or create scribble pattern with text bounds
+  const getScribblePattern = useCallback((textBounds?: { x: number; y: number; width: number; height: number; }): ScribbleStroke[] => {
     if (!hasScribble) return [];
     
-    if (scribbleCacheRef.current.has(scribbleCacheKey)) {
-      return scribbleCacheRef.current.get(scribbleCacheKey)!;
+    const cacheKey = `${scribbleCacheKey}-${textBounds ? `${textBounds.x}-${textBounds.y}-${textBounds.width}-${textBounds.height}` : 'no-bounds'}`;
+    
+    if (scribbleCacheRef.current.has(cacheKey)) {
+      return scribbleCacheRef.current.get(cacheKey)!;
     }
 
     const canvasSize = CANVAS_SIZES[size];
-    const pattern = createScribbleCache({
+    const pattern = generateScribblePattern({
       width: canvasSize.width,
       height: canvasSize.height,
       intensity: 0.6,
-      seed: text.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+      seed: text.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0),
+      textBounds: textBounds
     });
 
-    scribbleCacheRef.current.set(scribbleCacheKey, pattern);
+    scribbleCacheRef.current.set(cacheKey, pattern);
     return pattern;
   }, [hasScribble, scribbleCacheKey, size, text]);
 
@@ -97,12 +100,12 @@ export const Canvas = ({
 
       // Only render text if provided
       if (text.trim()) {
-        // Render text
-        renderText(ctx, renderConfig);
+        // Render text and get its bounding box
+        const textBounds = renderText(ctx, renderConfig);
 
-        // Render scribble effect if enabled
+        // Render scribble effect if enabled, using text bounds
         if (hasScribble) {
-          const scribblePattern = getScribblePattern();
+          const scribblePattern = getScribblePattern(textBounds);
           if (scribblePattern.length > 0) {
             renderScribbleToCanvas(ctx, scribblePattern);
           }
