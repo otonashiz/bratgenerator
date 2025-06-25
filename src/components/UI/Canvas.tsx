@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useCallback, useMemo, useState } from 'react';
 import type { RenderConfig } from '@/types/canvas';
 import { CANVAS_SIZES } from '@/types/canvas';
 import { BRAT_COLORS } from '@/constants/colors';
@@ -24,6 +24,7 @@ interface CanvasProps {
   className?: string;
   onRenderComplete?: () => void;
   onError?: (error: Error) => void;
+  onTextChange?: (text: string) => void;
 }
 
 export const Canvas = ({
@@ -32,11 +33,50 @@ export const Canvas = ({
   size,
   className = '',
   onRenderComplete,
-  onError
+  onError,
+  onTextChange
 }: CanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scribbleCacheRef = useRef(new Map<string, ScribbleStroke[]>());
   const animationFrameRef = useRef<number | undefined>(undefined);
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  // 编辑状态管理
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState('');
+
+  // 编辑相关处理函数
+  const handleCanvasClick = useCallback(() => {
+    if (!isEditing && onTextChange) {
+      setIsEditing(true);
+      setEditValue(text || '');
+      // 下一帧聚焦输入框
+      setTimeout(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      }, 0);
+    }
+  }, [isEditing, text, onTextChange]);
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditValue(e.target.value);
+  }, []);
+
+  const handleInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      onTextChange?.(editValue);
+      setIsEditing(false);
+    }
+    if (e.key === 'Escape') {
+      setEditValue(text || '');
+      setIsEditing(false);
+    }
+  }, [editValue, text, onTextChange]);
+
+  const handleInputBlur = useCallback(() => {
+    onTextChange?.(editValue);
+    setIsEditing(false);
+  }, [editValue, onTextChange]);
 
   // Memoize render config to prevent unnecessary re-renders
   const renderConfig: RenderConfig = useMemo(() => ({
@@ -98,7 +138,7 @@ export const Canvas = ({
       // Clear with background color
       clearCanvas(ctx, canvasSize.width, canvasSize.height);
 
-      // Only render text if provided
+      // 显示文字内容或默认提示
       if (text.trim()) {
         // Render text and get its bounding box
         const textBounds = renderText(ctx, renderConfig);
@@ -111,12 +151,12 @@ export const Canvas = ({
           }
         }
       } else {
-        // Show placeholder text when empty
-        ctx.font = 'normal 24px Arial, sans-serif';
-        ctx.fillStyle = BRAT_COLORS.text;
-        ctx.globalAlpha = 0.3;
-        ctx.fillText('Enter text to preview', canvasSize.width / 2, canvasSize.height / 2);
-        ctx.globalAlpha = 1.0;
+        // 显示默认的 'Text Here' 提示
+        const placeholderConfig: RenderConfig = {
+          ...renderConfig,
+          text: 'Text Here'
+        };
+        renderText(ctx, placeholderConfig);
       }
 
       onRenderComplete?.();
@@ -155,15 +195,33 @@ export const Canvas = ({
   };
 
   return (
-    <div className={`flex items-center justify-center ${className}`}>
+    <div className={`flex items-center justify-center relative ${className}`}>
       <canvas
         ref={canvasRef}
         width={canvasSize.width}
         height={canvasSize.height}
         style={canvasStyle}
-        className="border-2 border-gray-300 rounded-lg shadow-lg bg-white"
-        aria-label={`Brat generator preview: ${text || 'Empty'}`}
+        className="border-2 border-gray-300 rounded-lg shadow-lg bg-white cursor-pointer"
+        aria-label={`Brat generator preview: ${text || 'Text Here'}`}
+        onClick={handleCanvasClick}
       />
+      
+      {/* 编辑输入框 */}
+      {isEditing && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <input
+            ref={inputRef}
+            type="text"
+            value={editValue}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            onBlur={handleInputBlur}
+            className="px-4 py-2 text-lg font-medium text-center bg-white border-2 border-brat-green rounded-lg shadow-lg outline-none max-w-[80%]"
+            maxLength={50}
+            placeholder="Enter your text"
+          />
+        </div>
+      )}
     </div>
   );
 }; 
