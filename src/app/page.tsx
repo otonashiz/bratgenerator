@@ -16,7 +16,6 @@ export default function BratGenerator() {
     setHasScribble,
     setSize,
     exportImage,
-    reset,
     canvasRef,
   } = useGenerator();
 
