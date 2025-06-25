@@ -3,6 +3,7 @@
 import { useGenerator } from '@/hooks';
 import { Toggle, Canvas } from '@/components/UI';
 import { DownloadButton } from '@/components/Controls';
+import { TutorialSection, FeatureSection } from '@/components/SEO';
 
 export default function BratGenerator() {
   const {
@@ -127,8 +128,14 @@ export default function BratGenerator() {
           </div>
         </div>
 
+        {/* SEO Content Sections */}
+        <div className="mt-16">
+          <TutorialSection />
+          <FeatureSection />
+        </div>
+
         {/* Footer Info */}
-        <div className="mt-12 text-center text-gray-500 text-sm">
+        <div className="mt-16 text-center text-gray-500 text-sm">
           <p>
             Inspired by Charli XCX&apos;s &quot;Brat&quot; album cover. 
             Create your own custom covers with the signature style.

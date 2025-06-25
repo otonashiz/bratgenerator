@@ -6,24 +6,23 @@
 
 ### **3.2 关键词策略**
 
-- **主要关键词:** `Brat Generator`
-- **次要关键词:** `Brat album cover maker`, `Charli XCX meme generator`, `brat green image generator`
-- **长尾关键词:** `how to make brat cover online`, `brat album cover font`, `brat meme text generator`
+- **主要关键词:** `brat generator`
+- **次要关键词:** `brat text generator`, `brat font generator`, `brat album cover generator`, `brat generator charli xcx`, `brat meme generator`
+- **长尾关键词:**  `charli xcx brat generator`, `brat cover generator`, `brat album generator`, `brat lyric generator`, `brat charli xcx generator`, 
 
 ### **3.3 站内优化 (On-Page SEO)**
 
 - **`<title>` 标签:** `Brat Generator - Create Your Custom Brat Album Cover`
 - **Meta Description:** `The fastest, ad-free Brat Generator. Create your Charli XCX album cover meme for Instagram and Twitter in seconds. Choose with or without strikethrough. Try now!`
-- **URL结构:** 使用根域名 `yoursite.com`，保持URL干净。
+- **URL结构:** 使用根域名 `brat-generator.site`，保持URL干净。
 - **标题标签 (Header Tags):**
-    - `<h1>`: 网站主标题，如 "Brat Generator"。
+    - `<h1>`: 网站主标题，已实现为 "Brat Generator"。
     - `<h2>`: 用于页面上支持性内容块的标题。
 - **内容中心 (Content Hub):**
-    - 在工具下方，创建一个简短但信息丰富的内容区域，使用 `<h2>`, `<h3>` 标签组织。
-    - **建议主题:**
-        - "What is the 'Brat' Album Cover Meme?" (解释此文化现象)
-        - "How to Create Your Brat Cover in 3 Steps" (简单的图文教程)
-        - "The Story Behind the 'Brat Green' Color" (增加趣味性和相关性)
+    - 在工具下方，创建了两个信息丰富的内容区域，使用 `<h2>`, `<h3>` 标签组织，以增强SEO。
+    - **已实现主题:**
+        - "How to Use Our Brat Generator" (详细的图文使用教程，融入了各级关键词)
+        - "Why Choose Our Brat Generator?" (突出网站核心优势，吸引用户并强化关键词)
     - **目的:** 丰富页面内容，提升主题权威性，捕获长尾关键词流量。
 - **技术SEO:**
     - **性能:** 确保网站极速加载，力争 Core Web Vitals 全绿。
