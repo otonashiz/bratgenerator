@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://brat-generator.site'),
+  metadataBase: new URL('https://www.brat-generator.site'),
   title: "Brat Generator - Create Your Custom Brat Album Cover",
   description: "The fastest, ad-free Brat Generator. Create your Charli XCX brat cover meme in seconds.",
   keywords: [
@@ -109,10 +109,10 @@ export default function RootLayout({
               {
                 "@type": "WebSite",
                 "name": "Brat Generator",
-                "url": "https://brat-generator.site",
+                "url": "https://www.brat-generator.site",
                 "potentialAction": {
                   "@type": "SearchAction",
-                  "target": "https://brat-generator.site/?q={search_term_string}",
+                  "target": "https://www.brat-generator.site/?q={search_term_string}",
                   "query-input": "required name=search_term_string"
                 }
               },
@@ -131,9 +131,9 @@ export default function RootLayout({
                   "price": "0",
                   "priceCurrency": "USD"
                 },
-                "description": "The fastest, ad-free Brat Generator. Create your Charli XCX album cover meme for Instagram and Twitter in seconds. Choose with or without strikethrough. Try now!",
-                "url": "https://brat-generator.site",
-                "screenshot": "https://brat-generator.site/og-image.png"
+                "description": "The fastest, ad-free Brat Generator. Create your Charli XCX brat cover meme in seconds.",
+                "url": "https://www.brat-generator.site",
+                "screenshot": "https://www.brat-generator.site/og-image.png"
               }
             ]
           })}}
