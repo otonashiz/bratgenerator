@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from '@vercel/analytics/next';
+import Script from 'next/script';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,19 +15,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://brat-generator.site'),
   title: "Brat Generator - Create Your Custom Brat Album Cover",
-  description: "The fastest, ad-free Brat Generator. Create your Charli XCX album cover meme for Instagram and Twitter in seconds. Choose with or without strikethrough. Try now!",
+  description: "The fastest, ad-free Brat Generator. Create your Charli XCX brat cover meme in seconds.",
   keywords: [
+    "Charli XCX Brat generator",
     "brat generator",
     "brat text generator", 
     "brat font generator",
     "brat album cover generator",
-    "brat generator charli xcx",
     "brat meme generator",
     "charli xcx brat generator",
-    "brat cover generator",
-    "brat album generator",
-    "brat lyric generator",
     "brat charli xcx generator"
   ],
   authors: [{ name: "Brat Generator" }],
@@ -145,6 +144,22 @@ export default function RootLayout({
       >
         {children}
         <Analytics />
+        <Script 
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-E14XRMSHJM" 
+        />
+        <Script 
+          id="google-analytics" 
+          strategy="afterInteractive"
+        >
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            
+            gtag('config', 'G-E14XRMSHJM');
+          `}
+        </Script>
       </body>
     </html>
   );
