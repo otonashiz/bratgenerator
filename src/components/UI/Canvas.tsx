@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useMemo, useState } from 'react';
+import { useEffect, useRef, useCallback, useMemo, useState, useLayoutEffect } from 'react';
 import type { RenderConfig } from '@/types/canvas';
 import { CANVAS_SIZES } from '@/types/canvas';
 import { BRAT_COLORS } from '@/constants/colors';
@@ -50,13 +50,15 @@ export const Canvas = ({
     if (!isEditing && onTextChange) {
       setIsEditing(true);
       setEditValue(text || '');
-      // 下一帧聚焦输入框
-      setTimeout(() => {
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      }, 0);
     }
   }, [isEditing, text, onTextChange]);
+
+  useLayoutEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [isEditing]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setEditValue(e.target.value);
