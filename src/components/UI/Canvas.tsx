@@ -39,7 +39,7 @@ export const Canvas = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scribbleCacheRef = useRef(new Map<string, ScribbleStroke[]>());
   const animationFrameRef = useRef<number | undefined>(undefined);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   
   // 编辑状态管理
   const [isEditing, setIsEditing] = useState(false);
@@ -60,15 +60,48 @@ export const Canvas = ({
     }
   }, [isEditing]);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditValue(e.target.value);
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    
+    // 限制最大行数为5行
+    const lines = value.split('\n');
+    if (lines.length > 5) {
+      return; // 如果超过5行，不允许输入
+    }
+    
+    // 检查每行字符数限制（建议30-40字符）
+    const maxCharsPerLine = 35;
+    const validLines = lines.every(line => line.length <= maxCharsPerLine);
+    if (!validLines) {
+      return; // 如果任何一行超过字符限制，不允许输入
+    }
+    
+    setEditValue(value);
+    
+    // 自动调整高度
+    const textarea = e.target;
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
   }, []);
 
-  const handleInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  const handleInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Shift+Enter 结束编辑
+    if (e.key === 'Enter' && e.shiftKey) {
+      e.preventDefault();
       onTextChange?.(editValue);
       setIsEditing(false);
+      return;
     }
+    
+    // 单独的Enter键换行（但要检查行数限制）
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const lines = editValue.split('\n');
+      if (lines.length >= 5) {
+        e.preventDefault(); // 阻止换行如果已经达到最大行数
+        return;
+      }
+    }
+    
     if (e.key === 'Escape') {
       setEditValue(text || '');
       setIsEditing(false);
@@ -208,19 +241,25 @@ export const Canvas = ({
         onClick={handleCanvasClick}
       />
       
-      {/* 编辑输入框 */}
+      {/* 编辑输入框 - 改为textarea */}
       {isEditing && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <input
-            ref={inputRef}
-            type="text"
+          <textarea
+            ref={inputRef as React.RefObject<HTMLTextAreaElement>}
             value={editValue}
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
             onBlur={handleInputBlur}
-            className="px-4 py-2 text-lg font-medium text-center bg-white border-2 border-brat-green rounded-lg shadow-lg outline-none max-w-[80%]"
-            maxLength={50}
-            placeholder="Enter your text"
+            className="px-4 py-2 text-lg font-medium text-center bg-white border-2 border-brat-green rounded-lg shadow-lg outline-none max-w-[80%] resize-none"
+            rows={3}
+            maxLength={175} // 5行 × 35字符/行
+            placeholder="Text here (Enter for new line)"
+            enterKeyHint="enter"
+            style={{ 
+              minHeight: '60px',
+              maxHeight: '150px',
+              lineHeight: '1.4'
+            }}
           />
         </div>
       )}

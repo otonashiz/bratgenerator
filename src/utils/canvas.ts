@@ -110,6 +110,48 @@ export function calculateOptimalFontSize(
 }
 
 /**
+ * 处理文本的智能换行（支持手动换行符和自动换行）
+ */
+function processTextWithSmartWrapping(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number
+): string[] {
+  // 首先按手动换行符分割
+  const manualLines = text.split('\n');
+  const finalLines: string[] = [];
+  
+  // 对每个手动行进行自动换行处理
+  manualLines.forEach(line => {
+    if (!line.trim()) {
+      finalLines.push(''); // 保留空行
+      return;
+    }
+    
+    const words = line.split(' ');
+    let currentLine = '';
+    
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const metrics = ctx.measureText(testLine);
+      
+      if (metrics.width > maxWidth && currentLine) {
+        finalLines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    
+    if (currentLine) {
+      finalLines.push(currentLine);
+    }
+  });
+  
+  return finalLines;
+}
+
+/**
  * Renders text with optimal sizing and positioning
  * @returns The bounding box of the rendered text
  */
@@ -125,12 +167,15 @@ export function renderText(
   const textWidth = canvasSize.width - (margin * 2);
   const textHeight = canvasSize.height - (margin * 2);
   
-  // Calculate optimal font size
+  // Calculate optimal font size - 对于多行文本，使用更保守的估算
+  const estimatedLines = Math.max(1, text.split('\n').length);
+  const adjustedText = estimatedLines > 1 ? text.substring(0, Math.floor(text.length / estimatedLines)) : text;
+  
   const fontSize = calculateOptimalFontSize(
     ctx,
-    text,
+    adjustedText,
     textWidth,
-    textHeight,
+    textHeight / Math.max(1, estimatedLines - 1), // 为多行预留空间
     'Arial Narrow, Arial, sans-serif'
   );
   
@@ -144,26 +189,8 @@ export function renderText(
   const centerX = canvasSize.width / 2;
   const centerY = canvasSize.height / 2;
   
-  // Handle multi-line text if needed
-  const words = text.split(' ');
-  const lines = [];
-  let currentLine = '';
-  
-  for (const word of words) {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    const metrics = ctx.measureText(testLine);
-    
-    if (metrics.width > textWidth && currentLine) {
-      lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
-  }
-  
-  if (currentLine) {
-    lines.push(currentLine);
-  }
+  // 使用智能换行处理
+  const lines = processTextWithSmartWrapping(ctx, text, textWidth);
   
   // Calculate dimensions for the entire text block
   const lineHeight = fontSize * 1.2;

@@ -33,6 +33,8 @@ export interface TextInputProps {
   disabled?: boolean;
   maxLength?: number;
   className?: string;
+  rows?: number;
+  enterKeyHint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send";
 }
 
 export interface SizeSelectorProps {
