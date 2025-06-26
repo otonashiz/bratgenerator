@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.brat-generator.site'),
   title: "Brat Generator - Create Your Custom Brat Album Cover",
-  description: "The fastest, ad-free Brat Generator. Create your Charli XCX brat cover meme in seconds.",
+  description: "Instantly create your custom Charli XCX brat album cover with the fastest, ad-free Brat Generator. Add text, toggle the signature scribble, and download in seconds.",
   keywords: [
     "Charli XCX Brat generator",
     "brat generator",
