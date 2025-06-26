@@ -3,3 +3,104 @@ description:
 globs:
 alwaysApply: false
 ---
+# Technical Stack & Architecture Rules
+
+## Mandatory Technology Stack
+Based on [03_development_stack.md](mdc:03_development_stack.md), these technologies are **required** and cannot be substituted:
+
+### Core Framework
+- **Next.js 14+ (App Router)** - REQUIRED for SEO and performance
+- **TypeScript 5+** - REQUIRED for type safety
+- **React 18+** - REQUIRED as Next.js dependency
+
+### Styling & UI
+- **Tailwind CSS 3+** - REQUIRED for consistent design system
+- **CSS Variables** - For theme consistency with design guidelines
+
+### Image Generation
+- **Canvas API (Native)** - REQUIRED for pixel-perfect rendering
+- **Web APIs Only** - No third-party canvas libraries allowed
+
+### Development Tools
+- **ESLint + Next.js Config** - REQUIRED for code quality
+- **Prettier** - REQUIRED for code formatting
+- **TypeScript Strict Mode** - REQUIRED for type safety
+
+## Folder Structure (ENFORCE)
+```
+src/
+├── app/                    # Next.js App Router (REQUIRED)
+│   ├── page.tsx           # Main page (REQUIRED)
+│   ├── layout.tsx         # Root layout with SEO (REQUIRED)
+│   ├── globals.css        # Global styles (REQUIRED)
+│   └── not-found.tsx      # 404 page (REQUIRED)
+├── components/            # React components (REQUIRED)
+│   ├── BratGenerator.tsx  # Main component (REQUIRED)
+│   ├── Canvas.tsx         # Canvas component (REQUIRED)
+│   ├── Controls/          # Control components (REQUIRED)
+│   └── UI/                # Base UI components (REQUIRED)
+├── hooks/                 # Custom React hooks (REQUIRED)
+│   ├── useCanvas.ts       # Canvas logic (REQUIRED)
+│   ├── useBratText.ts     # Text processing (REQUIRED)
+│   └── useDebounce.ts     # Performance optimization (REQUIRED)
+├── utils/                 # Utility functions (REQUIRED)
+│   ├── canvas-renderer.ts # Canvas rendering (REQUIRED)
+│   ├── scribble-effect.ts # Scribble algorithm (REQUIRED)
+│   ├── text-processor.ts  # Text processing (REQUIRED)
+│   └── image-exporter.ts  # Export functionality (REQUIRED)
+├── constants/             # App constants (REQUIRED)
+│   ├── colors.ts          # Brat color palette (REQUIRED)
+│   └── fonts.ts           # Font configurations (REQUIRED)
+└── types/                 # TypeScript definitions (REQUIRED)
+    ├── canvas.ts          # Canvas types (REQUIRED)
+    └── generator.ts       # Generator types (REQUIRED)
+```
+
+## Required TypeScript Interfaces
+```typescript
+// These interfaces are MANDATORY and must be implemented exactly:
+
+interface RenderConfig {
+  text: string;
+  hasScribble: boolean;
+  size: '1:1' | '4:5';
+  backgroundColor: string;
+  textColor: string;
+  fontSize: number;
+}
+
+interface BratCanvasRenderer {
+  render(config: RenderConfig): void;
+  drawScribbleEffect(config: RenderConfig): void;
+  exportImage(format: 'png'): Promise<Blob>;
+}
+```
+
+## Performance Requirements (NON-NEGOTIABLE)
+- **Canvas Rendering**: Must use `requestAnimationFrame` for smooth updates
+- **Text Input**: Must debounce at 150ms for optimal performance
+- **Image Export**: Must support 2x resolution for high-quality output
+- **Font Loading**: Must preload Arial Narrow for consistent rendering
+- **Bundle Size**: Main bundle must be <500KB gzipped
+
+## Deployment Configuration (REQUIRED)
+- **Platform**: Vercel (REQUIRED for optimal Next.js performance)
+- **Node Version**: 18+ (REQUIRED)
+- **Environment**: Production builds only
+- **Analytics**: Google Analytics + Vercel Analytics (REQUIRED for SEO tracking)
+
+## Banned Technologies/Patterns
+- ❌ No client-side rendering frameworks other than React
+- ❌ No CSS-in-JS libraries (styled-components, emotion, etc.)
+- ❌ No external image generation libraries
+- ❌ No jQuery or legacy DOM manipulation
+- ❌ No pages router - App Router only
+- ❌ No default exports for components (use named exports)
+- ❌ No prop drilling (use proper state management)
+
+## Code Quality Standards (ENFORCED)
+- All components must be typed with proper TypeScript interfaces
+- All functions must have explicit return types
+- All async operations must include proper error handling
+- All Canvas operations must be wrapped in try-catch blocks
+- All external data must be validated with TypeScript guards

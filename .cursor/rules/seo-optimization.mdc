@@ -3,3 +3,490 @@ description:
 globs:
 alwaysApply: false
 ---
+# SEO Optimization Rules
+
+## SEO Requirements (CRITICAL FOR SUCCESS)
+Based on [05_seo_guideline.md](mdc:05_seo_guideline.md) and our marketing strategy, these SEO implementations are **mandatory** for achieving top search rankings.
+
+### Target Keywords (EXACT IMPLEMENTATION)
+```typescript
+// REQUIRED: Primary and secondary keywords to target
+const PRIMARY_KEYWORDS = [
+  'brat generator',
+  'brat album cover generator', 
+  'charli xcx brat generator',
+  'brat green image generator'
+] as const;
+
+const SECONDARY_KEYWORDS = [
+  'charli xcx album cover maker',
+  'brat style text generator',
+  'lime green aesthetic generator',
+  'brat font generator',
+  'social media brat generator'
+] as const;
+
+const LONG_TAIL_KEYWORDS = [
+  'how to make brat album cover',
+  'free brat generator no watermark',
+  'brat generator with scribble effect',
+  'charli xcx brat meme generator'
+] as const;
+```
+
+### Metadata Configuration (MANDATORY)
+```typescript
+// REQUIRED: Root layout metadata (app/layout.tsx)
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  // REQUIRED: Exact title format for SEO
+  title: 'Brat Generator - Create Your Custom Brat Album Cover | Free Online Tool',
+  
+  // REQUIRED: Exact description (155 characters max)
+  description: 'The fastest, ad-free Brat Generator. Create your Charli XCX album cover meme for Instagram and Twitter in seconds. Choose with or without strikethrough. Try now!',
+  
+  // REQUIRED: Keyword targeting
+  keywords: 'Brat Generator, Charli XCX, album cover maker, brat green image generator, charli xcx brat generator, social media generator',
+  
+  // REQUIRED: Open Graph configuration
+  openGraph: {
+    title: 'Free Brat Generator - Create Charli XCX Style Album Covers',
+    description: 'Create custom Brat album covers instantly. Free, fast, and no watermarks.',
+    url: 'https://yourdomain.com',
+    siteName: 'Brat Generator',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Brat Generator - Create your custom album cover'
+      }
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  
+  // REQUIRED: Twitter Card configuration
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Free Brat Generator - Create Charli XCX Style Covers',
+    description: 'Create custom Brat album covers instantly',
+    images: ['/twitter-image.png'],
+    creator: '@yourusername'
+  },
+  
+  // REQUIRED: Robot configuration
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  
+  // REQUIRED: Additional meta tags
+  verification: {
+    google: 'your-google-verification-code',
+  },
+  
+  // REQUIRED: Canonical URL
+  alternates: {
+    canonical: 'https://yourdomain.com',
+  }
+};
+```
+
+### Structured Data (MANDATORY)
+```typescript
+// REQUIRED: JSON-LD structured data (components/StructuredData.tsx)
+export const StructuredData = () => {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Brat Generator",
+    "description": "Free online tool to create Charli XCX Brat style album covers with customizable text and scribble effects",
+    "url": "https://yourdomain.com",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Web Browser",
+    "permissions": "No permissions required",
+    "isAccessibleForFree": true,
+    "creator": {
+      "@type": "Organization",
+      "name": "Your Organization Name"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5",
+      "reviewCount": "1"
+    },
+    "screenshot": "https://yourdomain.com/app-screenshot.png",
+    "featureList": [
+      "Real-time text preview",
+      "Scribble effect toggle", 
+      "Multiple size options",
+      "High-resolution download",
+      "Mobile optimized",
+      "No watermarks"
+    ],
+    "browserRequirements": "Requires JavaScript enabled"
+  };
+  
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  );
+};
+```
+
+## Content Strategy (SEO-DRIVEN)
+
+### Required SEO Content Sections (IMPLEMENT ALL)
+```tsx
+// REQUIRED: SEO content component (components/SEOContent.tsx)
+export const SEOContent = () => {
+  return (
+    <main className="max-w-4xl mx-auto px-6 py-12 space-y-12">
+      {/* REQUIRED: H1 with primary keyword */}
+      <section>
+        <h1 className="text-3xl font-bold mb-6">
+          Free Brat Generator - Create Your Charli XCX Album Cover Online
+        </h1>
+        <p className="text-gray-600 leading-relaxed">
+          Transform any text into the iconic Brat album cover style with our free online generator. 
+          Create viral social media content that captures the essence of Charli XCX's groundbreaking 
+          "Brat" aesthetic in seconds.
+        </p>
+      </section>
+
+      {/* REQUIRED: Primary feature explanation */}
+      <section>
+        <h2 className="text-2xl font-bold mb-4">What is the Brat Album Cover Meme?</h2>
+        <p className="text-gray-600 leading-relaxed mb-4">
+          The Brat album cover meme originated from Charli XCX's album "Brat", featuring a 
+          minimalist lime green background (#BEFF34) with bold black Arial Narrow text. 
+          The distinctive scratched-out effect and raw aesthetic became a viral sensation 
+          across TikTok, Twitter, and Instagram.
+        </p>
+        <p className="text-gray-600 leading-relaxed">
+          Our generator perfectly recreates this iconic look, allowing you to create 
+          personalized Brat-style covers for social media posts, memes, and creative projects.
+        </p>
+      </section>
+
+      {/* REQUIRED: How-to section with keywords */}
+      <section>
+        <h2 className="text-2xl font-bold mb-4">How to Create Your Brat Cover in 3 Steps</h2>
+        <ol className="list-decimal list-inside space-y-3 text-gray-600">
+          <li><strong>Enter your text:</strong> Type any word or phrase in the input field above</li>
+          <li><strong>Toggle the scribble effect:</strong> Choose whether to include the signature scratched-out look</li>
+          <li><strong>Download your creation:</strong> Select your preferred size (1:1 for posts, 4:5 for feeds) and download instantly</li>
+        </ol>
+      </section>
+
+      {/* REQUIRED: Features section */}
+      <section>
+        <h2 className="text-2xl font-bold mb-4">Why Choose Our Brat Generator?</h2>
+        <ul className="grid md:grid-cols-2 gap-4 text-gray-600">
+          <li className="flex items-start space-x-2">
+            <span className="text-brat-green">✓</span>
+            <span><strong>100% Free:</strong> No watermarks, no sign-ups, no hidden costs</span>
+          </li>
+          <li className="flex items-start space-x-2">
+            <span className="text-brat-green">✓</span>
+            <span><strong>Authentic Design:</strong> Exact color match and typography</span>
+          </li>
+          <li className="flex items-start space-x-2">
+            <span className="text-brat-green">✓</span>
+            <span><strong>Mobile Optimized:</strong> Works perfectly on all devices</span>
+          </li>
+          <li className="flex items-start space-x-2">
+            <span className="text-brat-green">✓</span>
+            <span><strong>High Quality:</strong> Download in high resolution for any platform</span>
+          </li>
+        </ul>
+      </section>
+
+      {/* REQUIRED: FAQ section for long-tail keywords */}
+      <section>
+        <h2 className="text-2xl font-bold mb-4">Frequently Asked Questions</h2>
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Is this Brat generator really free?</h3>
+            <p className="text-gray-600">
+              Yes! Our Brat generator is completely free with no watermarks, no account required, 
+              and unlimited usage. We believe creative tools should be accessible to everyone.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg mb-2">What makes this different from other generators?</h3>
+            <p className="text-gray-600">
+              Our tool uses the exact Brat green color (#BEFF34) and Arial Narrow font for 
+              authentic reproduction. Plus, we're the only generator with a realistic scribble 
+              effect that matches the original album aesthetic.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Can I use these images for commercial purposes?</h3>
+            <p className="text-gray-600">
+              The images you create are yours to use. However, please respect Charli XCX's 
+              intellectual property and use generated content responsibly.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+};
+```
+
+## Technical SEO Implementation (MANDATORY)
+
+### Performance Optimization (REQUIRED)
+```typescript
+// REQUIRED: Core Web Vitals optimization (next.config.js)
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // REQUIRED: Image optimization
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
+  
+  // REQUIRED: Font optimization
+  optimizeFonts: true,
+  
+  // REQUIRED: Compression
+  compress: true,
+  
+  // REQUIRED: Headers for SEO and performance
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin'
+          }
+        ]
+      },
+      {
+        source: '/fonts/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      }
+    ];
+  },
+  
+  // REQUIRED: Redirects for SEO (if needed)
+  async redirects() {
+    return [
+      {
+        source: '/generator',
+        destination: '/',
+        permanent: true,
+      }
+    ];
+  }
+};
+
+module.exports = nextConfig;
+```
+
+### Analytics Implementation (REQUIRED)
+```tsx
+// REQUIRED: Google Analytics 4 (app/layout.tsx)
+import { GoogleAnalytics } from '@next/third-parties/google';
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <head>
+        {/* REQUIRED: Preconnect for performance */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+      </head>
+      <body>
+        {children}
+        <StructuredData />
+        {/* REQUIRED: Google Analytics */}
+        <GoogleAnalytics gaId="G-XXXXXXXXXX" />
+      </body>
+    </html>
+  );
+}
+```
+
+### Sitemap Generation (REQUIRED)
+```typescript
+// REQUIRED: Dynamic sitemap (app/sitemap.ts)
+import { MetadataRoute } from 'next';
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = 'https://yourdomain.com';
+  
+  return [
+    {
+      url: baseUrl,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 1,
+    },
+    {
+      url: `${baseUrl}/#how-to-use`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/#features`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    }
+  ];
+}
+```
+
+### Robots.txt (REQUIRED)
+```typescript
+// REQUIRED: Robots configuration (app/robots.ts)
+import { MetadataRoute } from 'next';
+
+export default function robots(): MetadataRoute.Robots {
+  const baseUrl = 'https://yourdomain.com';
+  
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
+      disallow: ['/api/', '/_next/'],
+    },
+    sitemap: `${baseUrl}/sitemap.xml`,
+  };
+}
+```
+
+## Content Marketing Strategy (REQUIRED)
+
+### Blog Content Plan (IMPLEMENT GRADUALLY)
+```typescript
+// REQUIRED: Content topics for blog posts (future implementation)
+const CONTENT_STRATEGY = [
+  {
+    title: "The Ultimate Guide to Creating Viral Brat Album Covers",
+    keywords: ["brat album cover tutorial", "how to make brat cover", "viral social media content"],
+    priority: "high"
+  },
+  {
+    title: "Charli XCX Brat Aesthetic: Colors, Fonts, and Design Elements Explained",
+    keywords: ["brat aesthetic guide", "charli xcx design", "brat album design"],
+    priority: "medium"
+  },
+  {
+    title: "10 Creative Ways to Use Brat Generator for Social Media",
+    keywords: ["brat generator ideas", "social media content creation", "brat memes"],
+    priority: "medium"
+  }
+] as const;
+```
+
+## Local SEO (FUTURE EXPANSION)
+```typescript
+// REQUIRED: International targeting setup
+const INTERNATIONAL_CONFIG = {
+  // Primary markets
+  'en-US': {
+    language: 'en',
+    country: 'US',
+    currency: 'USD'
+  },
+  // Future expansion markets
+  'id-ID': {
+    language: 'id', 
+    country: 'ID',
+    currency: 'IDR'
+  },
+  'en-PH': {
+    language: 'en',
+    country: 'PH', 
+    currency: 'PHP'
+  }
+} as const;
+```
+
+## SEO Monitoring (REQUIRED)
+
+### Key Metrics to Track (MANDATORY)
+```typescript
+// REQUIRED: SEO KPIs to monitor
+const SEO_METRICS = {
+  rankings: [
+    'brat generator',
+    'charli xcx generator', 
+    'brat album cover maker',
+    'free brat generator'
+  ],
+  coreWebVitals: {
+    LCP: '< 2.5s', // Largest Contentful Paint
+    FID: '< 100ms', // First Input Delay  
+    CLS: '< 0.1' // Cumulative Layout Shift
+  },
+  conversionGoals: [
+    'text_input_completion',
+    'image_download',
+    'scribble_toggle_usage',
+    'size_selection'
+  ]
+} as const;
+```
+
+## Forbidden SEO Practices
+- ❌ Never keyword stuff in content or meta tags
+- ❌ Never use hidden text or cloaking techniques
+- ❌ Never buy low-quality backlinks
+- ❌ Never duplicate content across pages
+- ❌ Never ignore Core Web Vitals performance
+- ❌ Never skip structured data implementation
+- ❌ Never use flash or non-crawlable content
+- ❌ Never forget to implement analytics tracking

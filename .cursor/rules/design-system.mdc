@@ -3,3 +3,207 @@ description:
 globs:
 alwaysApply: false
 ---
+# Design System & UI/UX Rules
+
+## Brand Identity (STRICTLY ENFORCED)
+Based on [02_Design_Guideline.md](mdc:02_Design_Guideline.md), these are non-negotiable brand requirements:
+
+### Color Palette (EXACT VALUES REQUIRED)
+```css
+/* PRIMARY COLORS - DO NOT MODIFY */
+--brat-green: #BEFF34;    /* Main background - EXACT match required */
+--brat-text: #000000;     /* Text color - Pure black only */
+--brat-accent: #000000;   /* UI elements - Pure black only */
+
+/* FORBIDDEN COLORS */
+/* Never use: any other shade of green, gray text, colored backgrounds */
+```
+
+### Typography (MANDATORY)
+```css
+/* CANVAS TEXT FONT (REQUIRED) */
+font-family: 'Arial Narrow', 'Helvetica Neue Condensed', sans-serif;
+
+/* UI INTERFACE FONT (REQUIRED) */
+font-family: 'Inter', 'Helvetica', 'system-ui', sans-serif;
+
+/* FONT LOADING (REQUIRED) */
+/* Arial Narrow must be preloaded for consistent rendering */
+```
+
+### Layout Requirements (NON-NEGOTIABLE)
+
+#### Mobile Layout (Primary - Mobile First)
+- **Scribble Toggle**: MUST be positioned at top-left corner, always visible
+- **Layout**: Vertical single-column layout
+- **Canvas**: Must be responsive and maintain aspect ratio
+- **Controls**: Bottom-fixed panel with size selector and download button
+- **Input**: Full-width text input with proper virtual keyboard handling
+
+#### Desktop Layout (Secondary)
+- **Layout**: Two-column layout (left controls, right canvas)
+- **Left Panel**: 384px width (w-96 in Tailwind)
+- **Controls**: All options visible in left panel
+- **Canvas**: Large preview area, centered in right panel
+
+## Component Design Standards
+
+### Required Components (MUST IMPLEMENT)
+```typescript
+// These components are MANDATORY:
+
+export const Toggle = ({ checked, onChange, label }: ToggleProps) => {
+  // REQUIRED: Green when active, gray when inactive
+  // REQUIRED: Smooth transition animations
+  // REQUIRED: Touch-friendly 44px minimum touch target
+}
+
+export const TextInput = ({ value, onChange, placeholder }: TextInputProps) => {
+  // REQUIRED: Full-width on mobile
+  // REQUIRED: Clean, minimal border styling
+  // REQUIRED: Proper focus states
+}
+
+export const SizeSelector = ({ value, onChange, options }: SizeSelectorProps) => {
+  // REQUIRED: Two options: "Post (1:1)" and "Feed (4:5)"
+  // REQUIRED: Clear visual indication of selected state
+}
+
+export const DownloadButton = ({ onClick }: DownloadButtonProps) => {
+  // REQUIRED: Primary action styling
+  // REQUIRED: Loading state support
+  // REQUIRED: High contrast for accessibility
+}
+```
+
+### Canvas Design Requirements (CRITICAL)
+- **Background**: Must use exact Brat green (#BEFF34)
+- **Text Rendering**: Arial Narrow font, black color, proper spacing
+- **Scribble Effect**: Multi-layer bezier curves, natural appearance
+- **Aspect Ratios**: Precise 1:1 and 4:5 ratios
+- **Resolution**: Support for 2x export resolution
+- **Responsive**: Must scale properly on all screen sizes
+
+## Responsive Design Rules (ENFORCED)
+
+### Breakpoints (Tailwind Standard)
+```css
+/* REQUIRED BREAKPOINTS */
+sm: 640px   /* Not used - mobile first approach */
+md: 768px   /* Desktop layout transition point */
+lg: 1024px  /* Enhanced desktop experience */
+xl: 1280px  /* Large screens optimization */
+```
+
+### Mobile-First Implementation (MANDATORY)
+```tsx
+// CORRECT PATTERN (REQUIRED):
+<div className="flex flex-col md:flex-row">
+  <div className="w-full md:w-96 p-6">
+    {/* Controls */}
+  </div>
+  <div className="flex-1 flex items-center justify-center p-6">
+    {/* Canvas */}
+  </div>
+</div>
+
+// FORBIDDEN PATTERNS:
+// - Desktop-first CSS
+// - Fixed pixel dimensions
+// - Non-responsive layouts
+```
+
+### Touch Interaction (MOBILE CRITICAL)
+- **Minimum Touch Target**: 44px (WCAG AAA compliance)
+- **Toggle Switch**: Minimum 48px width for easy interaction
+- **Button Spacing**: Minimum 8px between interactive elements
+- **Canvas Interaction**: Must handle touch events for mobile preview
+
+## Accessibility Standards (REQUIRED)
+
+### Color Contrast (ENFORCED)
+- **Text on Green Background**: Black text on #BEFF34 (passes WCAG AA)
+- **UI Elements**: High contrast black/white combinations only
+- **Focus States**: Visible focus indicators on all interactive elements
+
+### Keyboard Navigation (REQUIRED)
+```typescript
+// REQUIRED: All interactive elements must support:
+onKeyDown={(e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    // Trigger action
+  }
+}}
+```
+
+### Screen Reader Support (MANDATORY)
+```jsx
+// REQUIRED: Proper ARIA labels
+<button 
+  aria-label="Toggle scribble effect on text"
+  aria-pressed={hasScribble}
+>
+  Scribble
+</button>
+
+<canvas 
+  aria-label="Brat style image preview"
+  role="img"
+/>
+```
+
+## Animation & Interaction Guidelines
+
+### Required Animations
+```css
+/* TOGGLE TRANSITIONS (REQUIRED) */
+.toggle-switch {
+  transition: background-color 200ms ease-in-out;
+  transition: transform 200ms ease-in-out;
+}
+
+/* BUTTON STATES (REQUIRED) */
+.button {
+  transition: all 150ms ease-in-out;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+```
+
+### Performance Constraints
+- **Animation Duration**: Maximum 300ms for any transition
+- **Canvas Updates**: Must use `requestAnimationFrame`
+- **Debouncing**: Text input changes debounced at 150ms
+- **Image Generation**: Non-blocking UI during export
+
+## Error States & Loading (MANDATORY)
+
+### Required Error Handling
+```tsx
+// CANVAS ERROR STATE (REQUIRED)
+{error && (
+  <div className="text-red-600 text-sm">
+    Failed to generate image. Please try again.
+  </div>
+)}
+
+// LOADING STATE (REQUIRED)
+{isLoading && (
+  <div className="flex items-center space-x-2">
+    <div className="animate-spin h-4 w-4 border-2 border-brat-green"></div>
+    <span>Generating image...</span>
+  </div>
+)}
+```
+
+## Forbidden Design Patterns
+- ❌ No gradients or shadows on canvas
+- ❌ No colors other than green/black/white
+- ❌ No custom fonts other than Arial Narrow for canvas
+- ❌ No complex animations that impact performance
+- ❌ No non-responsive fixed layouts
+- ❌ No accessibility violations
+- ❌ No design inconsistencies with Brat aesthetic

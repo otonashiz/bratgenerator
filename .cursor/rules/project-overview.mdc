@@ -10,8 +10,8 @@ This is a **Brat-style image generator tool** - a lightweight, efficient online 
 
 ## Key Project Documents
 - [01_PRD.md](mdc:01_PRD.md) - Product Requirements Document
-- [02_Design_Guideline.md](mdc:02_Design_Guideline.md) - Design Guidelines  
-- [03_development_stack.md](mdc:03_development_stack.md) - Technical Stack Documentation
+- [02_design_guideline.md](mdc:.cursor/rules/02_design_guideline.md) - Design Guidelines  
+- [03_tech_stack.md](mdc:.cursor/rules/03_tech_stack.md) - Technical Stack Documentation
 - [04_implement_plan.md](mdc:04_implement_plan.md) - Implementation Plan
 - [05_seo_guideline.md](mdc:05_seo_guideline.md) - SEO Strategy
 

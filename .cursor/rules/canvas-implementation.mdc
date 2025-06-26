@@ -3,3 +3,417 @@ description:
 globs:
 alwaysApply: false
 ---
+# Canvas Implementation Rules
+
+## Canvas Core Requirements (CRITICAL)
+Based on [03_development_stack.md](mdc:03_development_stack.md) and technical specifications, these Canvas implementations are **mandatory**.
+
+### Canvas Initialization (REQUIRED PATTERN)
+```typescript
+// MANDATORY: Canvas setup pattern
+export class BratCanvasRenderer {
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
+  private dpr: number;
+
+  constructor(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d')!;
+    this.dpr = window.devicePixelRatio || 1;
+    this.setupHighDPI();
+  }
+
+  private setupHighDPI(): void {
+    // REQUIRED: High DPI support for sharp rendering
+    const rect = this.canvas.getBoundingClientRect();
+    this.canvas.width = rect.width * this.dpr;
+    this.canvas.height = rect.height * this.dpr;
+    this.ctx.scale(this.dpr, this.dpr);
+    this.canvas.style.width = rect.width + 'px';
+    this.canvas.style.height = rect.height + 'px';
+  }
+}
+```
+
+### Required Canvas Methods (IMPLEMENT ALL)
+```typescript
+interface BratCanvasRenderer {
+  // REQUIRED: Main rendering pipeline
+  render(config: RenderConfig): void;
+  
+  // REQUIRED: Background rendering
+  drawBackground(color: string): void;
+  
+  // REQUIRED: Text rendering with proper font handling
+  drawText(config: RenderConfig): void;
+  
+  // REQUIRED: Scribble effect implementation
+  drawScribbleEffect(config: RenderConfig): void;
+  
+  // REQUIRED: Canvas size management
+  setCanvasSize(size: '1:1' | '4:5'): void;
+  
+  // REQUIRED: High-resolution export
+  exportImage(format: 'png', scale?: number): Promise<Blob>;
+  
+  // REQUIRED: Memory management
+  destroy(): void;
+}
+```
+
+## Size Specifications (EXACT VALUES)
+
+### Canvas Dimensions (NON-NEGOTIABLE)
+```typescript
+// REQUIRED: Exact canvas sizes
+const CANVAS_SIZES = {
+  '1:1': {
+    width: 600,
+    height: 600,
+    label: 'Post (1:1)'
+  },
+  '4:5': {
+    width: 600,
+    height: 750,
+    label: 'Feed (4:5)'
+  }
+} as const;
+
+// REQUIRED: Export dimensions (high resolution)
+const EXPORT_SCALE = 2; // Always 2x for high quality
+```
+
+### Text Layout Constants (REQUIRED)
+```typescript
+// MANDATORY: Text positioning and spacing
+const TEXT_CONFIG = {
+  fontFamily: 'Arial Narrow, Helvetica Neue Condensed, sans-serif',
+  color: '#000000',
+  textAlign: 'center' as const,
+  textBaseline: 'middle' as const,
+  padding: 40, // Minimum padding from edges
+  lineHeight: 1.2,
+  maxLines: 4,
+  minFontSize: 24,
+  maxFontSize: 120
+} as const;
+```
+
+## Font Handling (CRITICAL IMPLEMENTATION)
+
+### Font Loading Strategy (REQUIRED)
+```typescript
+// MANDATORY: Font loading before Canvas operations
+export class FontLoader {
+  private static instance: FontLoader;
+  private fontsLoaded = new Set<string>();
+  
+  static getInstance(): FontLoader {
+    if (!FontLoader.instance) {
+      FontLoader.instance = new FontLoader();
+    }
+    return FontLoader.instance;
+  }
+
+  async loadArialNarrow(): Promise<void> {
+    if (this.fontsLoaded.has('Arial Narrow')) return;
+    
+    try {
+      const font = new FontFace(
+        'Arial Narrow',
+        'url(/fonts/arial-narrow.woff2) format("woff2")'
+      );
+      
+      await font.load();
+      document.fonts.add(font);
+      this.fontsLoaded.add('Arial Narrow');
+    } catch (error) {
+      console.warn('Arial Narrow failed to load, falling back to system font');
+      // Fallback to Helvetica Neue Condensed or system fonts
+    }
+  }
+}
+```
+
+### Font Measurement (REQUIRED PATTERN)
+```typescript
+// MANDATORY: Text measurement for layout
+class TextMeasurer {
+  private static measureContext: CanvasRenderingContext2D | null = null;
+  
+  static getMeasureContext(): CanvasRenderingContext2D {
+    if (!this.measureContext) {
+      const canvas = document.createElement('canvas');
+      this.measureContext = canvas.getContext('2d')!;
+    }
+    return this.measureContext;
+  }
+  
+  static measureText(text: string, fontSize: number): TextMetrics {
+    const ctx = this.getMeasureContext();
+    ctx.font = `${fontSize}px Arial Narrow, Helvetica Neue Condensed, sans-serif`;
+    return ctx.measureText(text);
+  }
+}
+```
+
+## Text Processing Algorithm (MANDATORY)
+
+### Intelligent Text Wrapping (REQUIRED)
+```typescript
+// REQUIRED: Smart text wrapping algorithm
+export class SmartTextProcessor {
+  static processText(text: string, maxWidth: number, maxHeight: number): ProcessedText {
+    // 1. Clean and normalize text
+    const cleanText = this.normalizeText(text);
+    
+    // 2. Calculate available space
+    const availableWidth = maxWidth - (TEXT_CONFIG.padding * 2);
+    const availableHeight = maxHeight - (TEXT_CONFIG.padding * 2);
+    
+    // 3. Wrap text into lines
+    const lines = this.wrapText(cleanText, availableWidth);
+    
+    // 4. Calculate optimal font size
+    const fontSize = this.calculateOptimalFontSize(lines, availableWidth, availableHeight);
+    
+    // 5. Generate final layout
+    const layout = this.calculateLayout(lines, fontSize, maxWidth, maxHeight);
+    
+    return { lines, fontSize, layout };
+  }
+  
+  private static wrapText(text: string, maxWidth: number): string[] {
+    const words = text.split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
+    
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const metrics = TextMeasurer.measureText(testLine, 48); // Base font size for measurement
+      
+      if (metrics.width <= maxWidth || !currentLine) {
+        currentLine = testLine;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    
+    if (currentLine) {
+      lines.push(currentLine);
+    }
+    
+    return lines.slice(0, TEXT_CONFIG.maxLines); // Limit to max lines
+  }
+  
+  private static calculateOptimalFontSize(
+    lines: string[], 
+    maxWidth: number, 
+    maxHeight: number
+  ): number {
+    const { minFontSize, maxFontSize, lineHeight } = TEXT_CONFIG;
+    
+    // Calculate font size based on available height
+    const totalLineHeight = lines.length * lineHeight;
+    const fontSizeByHeight = maxHeight / totalLineHeight;
+    
+    // Calculate font size based on longest line
+    const longestLine = lines.reduce((a, b) => a.length > b.length ? a : b);
+    const charWidth = 0.6; // Approximate character width ratio
+    const fontSizeByWidth = maxWidth / (longestLine.length * charWidth);
+    
+    // Use the smaller constraint and clamp to limits
+    const calculatedSize = Math.min(fontSizeByHeight, fontSizeByWidth);
+    return Math.max(minFontSize, Math.min(maxFontSize, calculatedSize));
+  }
+}
+```
+
+## Scribble Effect Algorithm (EXACT IMPLEMENTATION)
+
+### Multi-Layer Scribble (REQUIRED)
+```typescript
+// MANDATORY: Exact scribble implementation
+export class ScribbleEffect {
+  static draw(ctx: CanvasRenderingContext2D, textBounds: TextBounds): void {
+    ctx.save();
+    
+    // REQUIRED: Scribble rendering settings
+    ctx.globalCompositeOperation = 'source-atop';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#000000';
+    
+    // REQUIRED: Multiple layers for natural appearance
+    const layers = 3;
+    for (let layer = 0; layer < layers; layer++) {
+      this.drawScribbleLayer(ctx, textBounds, layer);
+    }
+    
+    ctx.restore();
+  }
+  
+  private static drawScribbleLayer(
+    ctx: CanvasRenderingContext2D, 
+    bounds: TextBounds, 
+    layerIndex: number
+  ): void {
+    const { x, y, width, height } = bounds;
+    
+    // REQUIRED: Layer-specific properties
+    const opacity = 0.2 + (layerIndex * 0.3);
+    const lineWidth = 2 + (layerIndex * 1.5);
+    const strokeCount = 6 + (layerIndex * 2);
+    
+    ctx.globalAlpha = opacity;
+    ctx.lineWidth = lineWidth;
+    
+    // REQUIRED: Generate organic scribble paths
+    for (let i = 0; i < strokeCount; i++) {
+      this.drawBezierScribble(ctx, bounds, layerIndex);
+    }
+  }
+  
+  private static drawBezierScribble(
+    ctx: CanvasRenderingContext2D, 
+    bounds: TextBounds, 
+    layerIndex: number
+  ): void {
+    const { x, y, width, height } = bounds;
+    
+    // REQUIRED: Random but controlled path generation
+    const startX = x + (Math.random() * width);
+    const startY = y + (height * 0.3) + (Math.random() * height * 0.4);
+    const endX = x + (Math.random() * width);
+    const endY = startY + (Math.random() * 20 - 10);
+    
+    // REQUIRED: Bezier control points for natural curves
+    const controlX1 = startX + (Math.random() - 0.5) * width * 0.3;
+    const controlY1 = startY + (Math.random() - 0.5) * 20;
+    const controlX2 = endX + (Math.random() - 0.5) * width * 0.3;
+    const controlY2 = endY + (Math.random() - 0.5) * 20;
+    
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.bezierCurveTo(controlX1, controlY1, controlX2, controlY2, endX, endY);
+    ctx.stroke();
+  }
+}
+```
+
+## Performance Optimization (MANDATORY)
+
+### Render Loop Optimization (REQUIRED)
+```typescript
+// MANDATORY: Optimized rendering pipeline
+export class OptimizedCanvasRenderer extends BratCanvasRenderer {
+  private lastRenderConfig: RenderConfig | null = null;
+  private animationFrameId: number | null = null;
+  
+  render(config: RenderConfig): void {
+    // REQUIRED: Skip unnecessary renders
+    if (this.configEquals(config, this.lastRenderConfig)) return;
+    
+    // REQUIRED: Cancel previous frame
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
+    
+    // REQUIRED: Schedule optimized render
+    this.animationFrameId = requestAnimationFrame(() => {
+      this.performRender(config);
+      this.lastRenderConfig = { ...config };
+      this.animationFrameId = null;
+    });
+  }
+  
+  private performRender(config: RenderConfig): void {
+    try {
+      this.clearCanvas();
+      this.drawBackground(config.backgroundColor);
+      
+      const processedText = SmartTextProcessor.processText(
+        config.text, 
+        this.canvas.width, 
+        this.canvas.height
+      );
+      
+      this.drawProcessedText(processedText, config);
+      
+      if (config.hasScribble) {
+        this.drawScribbleEffect(config);
+      }
+    } catch (error) {
+      console.error('Canvas render error:', error);
+      this.drawErrorState();
+    }
+  }
+}
+```
+
+### Memory Management (REQUIRED)
+```typescript
+// MANDATORY: Proper cleanup
+export class CanvasManager {
+  private renderers = new Set<BratCanvasRenderer>();
+  
+  createRenderer(canvas: HTMLCanvasElement): BratCanvasRenderer {
+    const renderer = new OptimizedCanvasRenderer(canvas);
+    this.renderers.add(renderer);
+    return renderer;
+  }
+  
+  destroyRenderer(renderer: BratCanvasRenderer): void {
+    renderer.destroy();
+    this.renderers.delete(renderer);
+  }
+  
+  cleanup(): void {
+    this.renderers.forEach(renderer => renderer.destroy());
+    this.renderers.clear();
+  }
+}
+```
+
+## Error Handling (MANDATORY)
+
+### Canvas Error Recovery (REQUIRED)
+```typescript
+// REQUIRED: Robust error handling
+class CanvasErrorHandler {
+  static handleRenderError(error: Error, canvas: HTMLCanvasElement): void {
+    console.error('Canvas render failed:', error);
+    
+    // REQUIRED: Display error state
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = '#f3f4f6';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = '#ef4444';
+      ctx.font = '16px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(
+        'Failed to render image', 
+        canvas.width / 2, 
+        canvas.height / 2
+      );
+    }
+  }
+  
+  static handleExportError(error: Error): never {
+    console.error('Image export failed:', error);
+    throw new Error('Failed to export image. Please try again.');
+  }
+}
+```
+
+## Forbidden Canvas Patterns
+- ❌ Never use `ctx.drawImage()` for text rendering
+- ❌ Never render without high-DPI support
+- ❌ Never block the main thread during rendering
+- ❌ Never skip error handling in Canvas operations
+- ❌ Never use Canvas for UI elements (only for image generation)
+- ❌ Never cache rendered frames in memory (regenerate on demand)
+- ❌ Never use synchronous font loading
