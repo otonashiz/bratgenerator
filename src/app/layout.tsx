@@ -32,6 +32,18 @@ export const metadata: Metadata = {
   authors: [{ name: "Brat Generator" }],
   creator: "Brat Generator",
   publisher: "Brat Generator",
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+    other: [
+      {
+        rel: 'icon',
+        type: 'image/x-icon',
+        sizes: '16x16 32x32',
+        url: '/favicon.ico',
+      },
+    ],
+  },
   robots: {
     index: true,
     follow: true,
@@ -52,7 +64,7 @@ export const metadata: Metadata = {
     description: 'The fastest, ad-free Brat Generator. Create your Charli XCX album cover meme for Instagram and Twitter in seconds. Choose with or without strikethrough. Try now!',
     images: [
       {
-        url: '/og-image.png', // 我们稍后需要创建这个图片
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Brat Generator - Create Custom Brat Album Covers',
@@ -63,18 +75,18 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Brat Generator - Create Your Custom Brat Album Cover',
     description: 'The fastest, ad-free Brat Generator. Create your Charli XCX album cover meme for Instagram and Twitter in seconds. Choose with or without strikethrough. Try now!',
-    images: ['/og-image.png'], // 同样需要创建这个图片
-    creator: '@bratgenerator', // 如果有Twitter账号可以更新
+    images: ['/og-image.png'],
+    creator: '@bratgenerator',
   },
   verification: {
-    google: 'your-google-verification-code', // 稍后需要从Search Console获取
+    google: 'your-google-verification-code',
   },
   alternates: {
     canonical: '/',
   },
   other: {
     'application-name': 'Brat Generator',
-    'theme-color': '#8ACE00', // brat green color
+    'theme-color': '#8ACE00',
     'msapplication-TileColor': '#8ACE00',
   },
 };
@@ -89,8 +101,6 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="format-detection" content="telephone=no" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
         <script
           type="application/ld+json"
