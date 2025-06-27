@@ -87,7 +87,7 @@ export function calculateOptimalFontSize(
   maxHeight: number,
   fontFamily: string = 'Arial Narrow, Arial, sans-serif',
   minSize: number = 20,
-  maxSize: number = 80
+  maxSize: number = 100
 ): number {
   let fontSize = maxSize;
   
