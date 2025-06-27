@@ -17,6 +17,104 @@ export default function ShowcaseSection() {
     { id: 6, text: "TRY AGAIN", format: "square", scribble: false }
   ];
 
+  // 简单的伪随机数生成器，基于文本内容
+  const seededRandom = (seed: string, index: number = 0) => {
+    let hash = 0;
+    const fullSeed = seed + index;
+    for (let i = 0; i < fullSeed.length; i++) {
+      const char = fullSeed.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash % 1000) / 1000;
+  };
+
+  // 生成更真实的scribble路径
+  const generateScribblePaths = (item: ShowcaseItem, textBounds: { x: number, y: number, width: number, height: number }) => {
+    const paths: string[] = [];
+    const numStrokes = 4 + Math.floor(seededRandom(item.text, 0) * 3); // 4-6条线
+    
+    for (let i = 0; i < numStrokes; i++) {
+      const isHorizontal = seededRandom(item.text, i * 10) < 0.6;
+      const pathSeed = item.text + i;
+      
+      let pathData = '';
+      
+      if (isHorizontal) {
+        // 横向涂抹线
+        const startX = textBounds.x - 20 - seededRandom(pathSeed, 1) * 15;
+        const endX = textBounds.x + textBounds.width + 20 + seededRandom(pathSeed, 2) * 15;
+        const baseY = textBounds.y + textBounds.height * (0.3 + seededRandom(pathSeed, 3) * 0.4);
+        
+        pathData = `M${startX} ${baseY}`;
+        
+        // 生成5-8个中间点，形成自然曲线
+        const numPoints = 5 + Math.floor(seededRandom(pathSeed, 4) * 3);
+        for (let j = 1; j < numPoints; j++) {
+          const progress = j / (numPoints - 1);
+          const x = startX + (endX - startX) * progress;
+          const yOffset = (seededRandom(pathSeed, j + 10) - 0.5) * 12;
+          const y = baseY + yOffset;
+          
+          if (j === 1) {
+            pathData += ` Q${x} ${y}`;
+          } else {
+            pathData += ` ${x} ${y}`;
+          }
+        }
+        
+      } else {
+        // 斜向涂抹线
+        const direction = seededRandom(pathSeed, 5) < 0.5 ? 1 : -1;
+        
+        let startX, startY, endX, endY;
+        if (direction > 0) {
+          // 左上到右下
+          startX = textBounds.x - 15 - seededRandom(pathSeed, 6) * 10;
+          startY = textBounds.y - 15 - seededRandom(pathSeed, 7) * 10;
+          endX = textBounds.x + textBounds.width + 15 + seededRandom(pathSeed, 8) * 10;
+          endY = textBounds.y + textBounds.height + 15 + seededRandom(pathSeed, 9) * 10;
+        } else {
+          // 右上到左下
+          startX = textBounds.x + textBounds.width + 15 + seededRandom(pathSeed, 6) * 10;
+          startY = textBounds.y - 15 - seededRandom(pathSeed, 7) * 10;
+          endX = textBounds.x - 15 - seededRandom(pathSeed, 8) * 10;
+          endY = textBounds.y + textBounds.height + 15 + seededRandom(pathSeed, 9) * 10;
+        }
+        
+        pathData = `M${startX} ${startY}`;
+        
+        // 生成中间点
+        const numPoints = 4 + Math.floor(seededRandom(pathSeed, 11) * 3);
+        for (let j = 1; j < numPoints; j++) {
+          const progress = j / (numPoints - 1);
+          const baseX = startX + (endX - startX) * progress;
+          const baseY = startY + (endY - startY) * progress;
+          
+          // 垂直于主方向的随机偏移
+          const perpOffset = (seededRandom(pathSeed, j + 20) - 0.5) * 8;
+          const angle = Math.atan2(endY - startY, endX - startX) + Math.PI / 2;
+          const x = baseX + Math.cos(angle) * perpOffset;
+          const y = baseY + Math.sin(angle) * perpOffset;
+          
+          if (j === 1) {
+            pathData += ` Q${x} ${y}`;
+          } else {
+            pathData += ` ${x} ${y}`;
+          }
+        }
+      }
+      
+      // 不同的线条粗细和透明度
+      const thickness = 2 + seededRandom(pathSeed, 30) * 2; // 2-4px
+      const opacity = 0.4 + seededRandom(pathSeed, 31) * 0.4; // 0.4-0.8
+      
+      paths.push(`<path d="${pathData}" stroke="#000" stroke-width="${thickness}" fill="none" stroke-linecap="round" stroke-opacity="${opacity}"/>`);
+    }
+    
+    return paths.join('');
+  };
+
   // 生成SVG预览图片
   const generateSVG = (item: ShowcaseItem) => {
     const isSquare = item.format === "square";
@@ -49,6 +147,14 @@ export default function ShowcaseSection() {
     const totalTextHeight = lines.length * lineHeight;
     const startY = (height - totalTextHeight) / 2 + fontSize / 2;
     
+    // 计算文本边界用于scribble
+    const textBounds = {
+      x: width * 0.1,
+      y: startY - fontSize * 0.6,
+      width: width * 0.8,
+      height: totalTextHeight
+    };
+    
     // 生成SVG
     return `
       <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
@@ -58,12 +164,7 @@ export default function ShowcaseSection() {
             `<text x="${width/2}" y="${startY + index * lineHeight}">${line}</text>`
           ).join('')}
         </g>
-        ${item.scribble ? `
-          <g stroke="#000" stroke-width="3" fill="none" stroke-linecap="round">
-            <path d="M${width*0.15} ${height/2} Q${width*0.35} ${height/2-5} ${width*0.5} ${height/2} Q${width*0.65} ${height/2+5} ${width*0.85} ${height/2}"/>
-            <path d="M${width*0.25} ${height/2-8} L${width*0.75} ${height/2+8}"/>
-          </g>
-        ` : ''}
+        ${item.scribble ? generateScribblePaths(item, textBounds) : ''}
       </svg>
     `;
   };
