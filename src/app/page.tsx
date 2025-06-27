@@ -3,7 +3,7 @@
 import { useGenerator } from '@/hooks';
 import { Toggle, Canvas } from '@/components/UI';
 import { DownloadButton } from '@/components/Controls';
-import { TutorialSection, FeatureSection, ShowcaseSection } from '@/components/SEO';
+import { ShowcaseSection, TutorialSection, FeatureSection } from '@/components/SEO';
 
 export default function BratGenerator() {
   const {
@@ -53,8 +53,8 @@ export default function BratGenerator() {
                 className="hidden"
                 width={size === '1:1' ? 600 : 600}
                 height={size === '1:1' ? 600 : 750}
-              />
-            </div>
+                />
+              </div>
           </div>
         </div>
 
@@ -91,7 +91,7 @@ export default function BratGenerator() {
               </svg>
               Story (4:5)
             </button>
-          </div>
+              </div>
 
           {/* Scribble Toggle - 简化版本 */}
           <div className="flex items-center justify-center gap-3">
@@ -102,28 +102,28 @@ export default function BratGenerator() {
                 <path d="M3 12c1-1 2 0 3 0s1-1 3 0 2 1 3 0" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
               </svg>
             </div>
-            <Toggle
-              checked={hasScribble}
-              onChange={setHasScribble}
+                <Toggle
+                  checked={hasScribble}
+                  onChange={setHasScribble}
               label=""
-              disabled={isLoading}
-            />
-          </div>
+                  disabled={isLoading}
+                />
+              </div>
 
-          {/* Error Display */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{error}</p>
-            </div>
-          )}
+              {/* Error Display */}
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 text-sm">{error}</p>
+                </div>
+              )}
 
-          {/* Action Buttons */}
+              {/* Action Buttons */}
           <div>
-            <DownloadButton
-              onClick={exportImage}
+                <DownloadButton
+                  onClick={exportImage}
               disabled={isLoading}
-              isLoading={isLoading}
-            />
+                  isLoading={isLoading}
+                />
           </div>
         </div>
 
