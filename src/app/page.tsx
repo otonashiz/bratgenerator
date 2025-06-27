@@ -3,7 +3,7 @@
 import { useGenerator } from '@/hooks';
 import { Toggle, Canvas } from '@/components/UI';
 import { DownloadButton } from '@/components/Controls';
-import { TutorialSection, FeatureSection } from '@/components/SEO';
+import { TutorialSection, FeatureSection, ShowcaseSection } from '@/components/SEO';
 
 export default function BratGenerator() {
   const {
@@ -129,6 +129,7 @@ export default function BratGenerator() {
 
         {/* SEO Content Sections */}
         <div className="mt-16">
+          <ShowcaseSection />
           <TutorialSection />
           <FeatureSection />
         </div>
