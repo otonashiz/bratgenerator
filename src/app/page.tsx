@@ -129,8 +129,8 @@ export default function BratGenerator() {
 
         {/* SEO Content Sections */}
         <div className="mt-16">
-          <ShowcaseSection />
           <TutorialSection />
+          <ShowcaseSection />
           <FeatureSection />
         </div>
 
